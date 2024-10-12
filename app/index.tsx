@@ -1,7 +1,8 @@
 import { styles } from "@/scripts/styles";
 import React, { useState, useEffect } from "react";
 import { Alert, Dimensions, Modal, Pressable, Text, Vibration, View, Switch } from "react-native";
-import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
+import { Dropdown } from "react-native-element-dropdown";
+import { themes } from "./themes";
 
 export default function Index() {
 
@@ -9,9 +10,9 @@ const [dt, setDt] = useState(new Date().toLocaleString());
 const [yr, setYr] = useState(new Date().getFullYear().toLocaleString());
 const [mnth, setMnth] = useState(new Date().getMonth().toLocaleString());
 const [day, setDay] = useState(new Date().getDay().toLocaleString());
-const [hr, setHr] = useState(new Date().getHours().toLocaleString());
-const [min, setMin] = useState(new Date().getMinutes().toLocaleString());
-const [sec, setSec] = useState(new Date().getSeconds().toLocaleString());
+const [hr, setHr] = useState(parseInt(new Date().getHours().toLocaleString()) >= 10 ? (new Date().getHours().toLocaleString()) : ("0".concat(new Date().getHours().toLocaleString())) );
+const [min, setMin] = useState(parseInt(new Date().getMinutes().toLocaleString()) >= 10 ? (new Date().getMinutes().toLocaleString()) : ("0".concat(new Date().getMinutes().toLocaleString())));
+const [sec, setSec] = useState(parseInt(new Date().getSeconds().toLocaleString()) >= 10 ? (new Date().getSeconds().toLocaleString()) : ("0".concat(new Date().getSeconds().toLocaleString())));
 
 const [orientation, setOrientation] = useState('LANDSCAPE');
 const [modalVisible, setModalVisible] = useState(false);
@@ -26,6 +27,9 @@ const toggle24hrSwitch = () => {
   setIs24hrFormat(previousState => !previousState);
 };
 
+const [selectedTheme, setSelectedTheme] = useState('1');
+
+
 useEffect(() => {
     let secTimer = setInterval( () => {
       var dateTime = new Date();
@@ -34,7 +38,7 @@ useEffect(() => {
       setMnth(dateTime.getMonth().toLocaleString());
       setDay(dateTime.getDay().toLocaleString());
 
-      let hours = is24hrFormat? dateTime.getHours().toLocaleString() : ((parseInt(dateTime.getHours().toLocaleString())> 12) ? (parseInt(dateTime.getHours().toLocaleString())-12).toLocaleString() : dateTime.getHours().toLocaleString());
+      let hours = is24hrFormat? dateTime.getHours().toLocaleString() : (((parseInt(dateTime.getHours().toLocaleString()) > 12) || (parseInt(dateTime.getHours().toLocaleString()) == 0)) ? Math.abs((parseInt(dateTime.getHours().toLocaleString())-12)).toLocaleString() : dateTime.getHours().toLocaleString());
       if(hours != hr){
         (parseInt(hours) >= 10) ? setHr(hours) : setHr("0".concat(hours));
       }
@@ -69,7 +73,6 @@ const determineAndSetOrientation = () => {
       setOrientation('LANDSCAPE');
     }
 }
-
 
   return (
     <View
@@ -119,6 +122,20 @@ const determineAndSetOrientation = () => {
               value={is24hrFormat}
             />
           </View>
+
+          <Dropdown
+              style={{width: 300}}
+              data={themes}
+              search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder="Select an option"
+              searchPlaceholder="Search..." 
+              onChange={item => {
+                setSelectedTheme(item.value);
+              }}     
+          />
 
             <Pressable
               style={[styles.button, styles.buttonClose]}
