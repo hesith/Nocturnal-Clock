@@ -3,7 +3,7 @@
     "name": "nocturnalClock",
     "slug": "nocturnalClock",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "landscape",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.phantomHookLabs.nocturnalClock"
     },
     "web": {
       "bundler": "metro",
@@ -27,10 +28,30 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Technology.ttf",
+            "./assets/fonts/Technology-Italic.ttf"
+          ]
+        }
+      ]
     ],
+    "androidNavigationBar": {
+      "visible": "sticky-immersive"
+    },
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "4669501a-3607-4d06-b8de-fd0dc3f4480b"
+      }
     }
   }
 }
