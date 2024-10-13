@@ -1,8 +1,8 @@
 import { styles } from "@/scripts/styles";
 import React, { useState, useEffect } from "react";
-import { Alert, Dimensions, Modal, Pressable, Text, Vibration, View, Switch } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
+import { Alert, Dimensions, Modal, Pressable, Text, Vibration, View, Switch, TouchableOpacity, SectionList, ScrollView, LogBox } from "react-native";
 import { themes } from "./themes";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
 
@@ -16,6 +16,8 @@ const [sec, setSec] = useState(parseInt(new Date().getSeconds().toLocaleString()
 
 const [orientation, setOrientation] = useState('LANDSCAPE');
 const [modalVisible, setModalVisible] = useState(false);
+const [modalThemeVisible, setModalThemeVisible] = useState(false);
+const [timerObj, setTimerObj] = useState({name: 'Digital', font: 'Technology-Italic', color: 'red', sizePerc: 0.2, locked: false});
 
 const [isSecondsVisible, setIsSecondsVisible] = useState(false);
 const toggleSecondsSwitch = () => {
@@ -60,6 +62,10 @@ useEffect(() => {
   }
 }, []);
 
+useEffect(() => {
+  LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
+}, [])
+
 let fixedWidth = Dimensions.get('window').width;
 let fixedHeight = Dimensions.get('window').height;
 
@@ -74,6 +80,8 @@ const determineAndSetOrientation = () => {
     }
 }
 
+
+
   return (
     <View
       style={{
@@ -84,8 +92,12 @@ const determineAndSetOrientation = () => {
       }}
     >
       <View>
-        <Text onLongPress={()=> {Vibration.vibrate(100); setModalVisible(!modalVisible);}} style={[styles.timerText, {fontSize: fixedHeight * 0.65}]}>{hr} : {min}</Text>
-        <Text onLongPress={()=> {Vibration.vibrate(100); setModalVisible(!modalVisible);}} style={[styles.timerTextSec, {display: isSecondsVisible? 'flex': 'none', width: fixedWidth * 0.95, fontSize: fixedHeight * 0.2}]}>{sec}</Text> 
+        <Text onLongPress={()=> {Vibration.vibrate(100); setModalVisible(!modalVisible);}} style={[styles.timerText, {fontSize: fixedHeight * 0.65 * timerObj.sizePerc * 1/0.2, fontFamily: timerObj.font, color: timerObj.color}]}>
+          {hr} : {min}
+        </Text>
+        <Text onLongPress={()=> {Vibration.vibrate(100); setModalVisible(!modalVisible);}} style={[styles.timerTextSec, {display: isSecondsVisible? 'flex': 'none', width: fixedWidth * 0.95, fontSize: fixedHeight * 0.2, fontFamily: timerObj.font, color: timerObj.color }]}>
+          {sec}
+        </Text> 
       </View>
 
 
@@ -98,7 +110,7 @@ const determineAndSetOrientation = () => {
           setModalVisible(!modalVisible);
         }}>
         <View style={styles.centeredView}>
-          <View style={styles.modalView}>
+          <View style={[styles.modalView, { opacity: modalThemeVisible? 0.01 : 1 }]}>
             <Text style={styles.modalText}>Clock Settings</Text>
 
           <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
@@ -123,19 +135,20 @@ const determineAndSetOrientation = () => {
             />
           </View>
 
-          <Dropdown
-              style={{width: 300}}
-              data={themes}
-              search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder="Select an option"
-              searchPlaceholder="Search..." 
-              onChange={item => {
-                setSelectedTheme(item.value);
-              }}     
-          />
+          <View style={[{flexDirection: 'row', flexWrap: 'wrap'}]}>
+            <TouchableOpacity onPressIn={()=>{
+              setModalThemeVisible(!modalThemeVisible);
+            }}
+            onPressOut={()=>{
+              //setModalThemeVisible(!modalThemeVisible);
+            }}>
+              <Text style={styles.modalTextInside}>Selected Theme</Text>
+            <View style={[styles.item, {width: fixedWidth * 0.3}]}>
+                <Text style={[styles.themeTime, {fontFamily: timerObj.font, color: timerObj.color, fontSize: fixedHeight * timerObj.sizePerc}]} >{hr} : {min}</Text>
+                <Text style={styles.themeName} >{timerObj.name}</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
 
             <Pressable
               style={[styles.button, styles.buttonClose]}
@@ -146,6 +159,46 @@ const determineAndSetOrientation = () => {
           </View>
         </View>
       </Modal>
+
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalThemeVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalThemeVisible(!modalThemeVisible);
+        }}>
+        <View style={styles.centeredView2}>
+          <View style={[styles.modalView2, {height: fixedHeight * 0.8 ,width: fixedWidth * 0.5}]}>
+
+          <ScrollView style={[{flexDirection: 'row', flexWrap: 'wrap', width: fixedWidth * 0.5, backgroundColor: 'black'}]}>
+          <SectionList
+            sections={themes}
+            keyExtractor={(item, index) => item.name + index}
+            renderItem={({item}) => (
+              <TouchableOpacity onPress={()=> {
+                setTimerObj(item);
+                setModalThemeVisible(!modalThemeVisible);
+                }}>
+              <View style={[styles.item, {width: fixedWidth * 0.5, borderWidth: (timerObj.font==item.font) ? 2 : 0, borderColor: timerObj.color}]}>
+              <Text style={[styles.Pro, {display: item.locked ? 'flex' : 'none'}]} >Pro Version 👑</Text>
+                <Text style={[styles.themeTime, {fontFamily: item.font, color: item.color, fontSize: fixedHeight * item.sizePerc}]} >{hr} : {min}</Text>
+                
+                <Text style={styles.themeName} >{item.name}</Text>
+              </View>
+              </TouchableOpacity>
+
+            )}
+            renderSectionHeader={({section: {title}}) => (
+              <Text style={styles.header}>{title}</Text>
+            )}
+          />
+          </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
 
     </View>
   );

@@ -33,8 +33,11 @@
         "expo-font",
         {
           "fonts": [
-            "./assets/fonts/Technology.ttf",
-            "./assets/fonts/Technology-Italic.ttf"
+            "./assets/fonts/Technology-Italic.ttf",
+            "./assets/fonts/Architex.ttf",
+            "./assets/fonts/Beyond Wonderland.ttf",
+            "./assets/fonts/BLKCHCRY.ttf",
+            "./assets/fonts/BRICK.ttf"
           ]
         }
       ]
