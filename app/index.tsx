@@ -189,8 +189,8 @@ return (
             <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
               <Text style={styles.modalTextInside}>Show seconds  </Text>
               <Switch
-                trackColor={{false: '#767577', true: '#81b0ff'}}
-                thumbColor={isSecondsVisible ? '#f5dd4b' : '#f4f3f4'}
+                trackColor={{false: '#767577', true: '#2196F3'}}
+                thumbColor={isSecondsVisible ? timerObj.color : '#f4f3f4'}
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={toggleSecondsSwitch}
                 value={isSecondsVisible}
@@ -200,8 +200,8 @@ return (
             <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
               <Text style={styles.modalTextInside}>24 Hour Format  </Text>
               <Switch
-                trackColor={{false: '#767577', true: '#81b0ff'}}
-                thumbColor={is24hrFormat ? '#f5dd4b' : '#f4f3f4'}
+                trackColor={{false: '#767577', true: '#2196F3'}}
+                thumbColor={is24hrFormat ? timerObj.color : '#f4f3f4'}
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={toggle24hrSwitch} 
                 value={is24hrFormat}
