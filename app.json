@@ -15,7 +15,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.phantomHookLabs.nocturnalClock"
+      "package": "com.phantomHookLabs.nocturnalClock",
+      "versionCode": 2
     },
     "web": {
       "bundler": "metro",
@@ -32,7 +33,24 @@
             "./assets/fonts/Architex.ttf",
             "./assets/fonts/Beyond Wonderland.ttf",
             "./assets/fonts/BLKCHCRY.ttf",
-            "./assets/fonts/BRICK.ttf"
+            "./assets/fonts/BRICK.ttf",
+            "./assets/fonts/budmo jiggler.otf",
+            "./assets/fonts/earwig factory rg.otf",
+            "./assets/fonts/ethnocentric rg it.otf",
+            "./assets/fonts/FFFFORWA.ttf",
+            "./assets/fonts/FrederickatheGreat-Regular.ttf",
+            "./assets/fonts/good times rg.otf",
+            "./assets/fonts/HarryP-MVZ6w.ttf",
+            "./assets/fonts/HOMOARAK.ttf",
+            "./assets/fonts/If.ttf",
+            "./assets/fonts/Kamikaze3DGradient.ttf",
+            "./assets/fonts/LeagueGothic-Regular.otf",
+            "./assets/fonts/LUMOS.ttf",
+            "./assets/fonts/mexcellent 3d.otf",
+            "./assets/fonts/MISTV___.ttf",
+            "./assets/fonts/Monoton-Regular.ttf",
+            "./assets/fonts/musicals.ttf"
+
           ]
         }
       ]

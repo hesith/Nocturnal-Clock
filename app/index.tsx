@@ -19,17 +19,33 @@ const [sec, setSec] = useState(parseInt(new Date().getSeconds().toLocaleString()
 const [orientation, setOrientation] = useState('LANDSCAPE');
 const [modalVisible, setModalVisible] = useState(false);
 const [modalThemeVisible, setModalThemeVisible] = useState(false);
-const [timerObj, setTimerObj] = useState({name: 'Digital', font: 'Technology-Italic', color: 'red', sizePerc: 0.2, locked: false});
+const [timerObj, setTimerObj] = useState<any>(null);
 
-const [isSecondsVisible, setIsSecondsVisible] = useState(false);
+const [needFontsReload, setNeedFontsReload] = useState(true);
+
+const [currentUserConfig, setCurrentUserConfig] = useState<any>(null);
+
+
+const [isSecondsVisible, setIsSecondsVisible] = useState<any>(null);
 const toggleSecondsSwitch = () => {
-  setIsSecondsVisible(previousState => !previousState);
+  let newCurrentUserConfig = ({name: currentUserConfig.name, font: currentUserConfig.font, color: currentUserConfig.color, sizePerc: currentUserConfig.sizePerc, locked: currentUserConfig.locked, isSecondsVisible: !isSecondsVisible, is24hrFormat: currentUserConfig.is24hrFormat})
+  setCurrentUserConfig(newCurrentUserConfig);
+  modifyData("UserConfig", newCurrentUserConfig);
+
+  setIsSecondsVisible((previousState: any) => !previousState);
+  setTimerObj(currentUserConfig);
 };
 
-const [is24hrFormat, setIs24hrFormat] = useState(true);
+const [is24hrFormat, setIs24hrFormat] = useState<any>(null);
 const toggle24hrSwitch = () => {
-  setIs24hrFormat(previousState => !previousState);
+  let newCurrentUserConfig = ({name: currentUserConfig.name, font: currentUserConfig.font, color: currentUserConfig.color, sizePerc: currentUserConfig.sizePerc, locked: currentUserConfig.locked, isSecondsVisible: currentUserConfig.isSecondsVisible, is24hrFormat: !is24hrFormat})
+  setCurrentUserConfig(newCurrentUserConfig);
+  modifyData("UserConfig", newCurrentUserConfig);
+
+  setIs24hrFormat((previousState: any) => !previousState);
+  setTimerObj(currentUserConfig);
 };
+
 
 
 const getData = async (key: string) => {
@@ -48,27 +64,38 @@ const storeData = async (key: string,value: any) => {
     // saving error
   }
 };
+const modifyData = async (key: string,value: any) => {
+  try {
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.mergeItem(key, jsonValue);
+  } catch (e) {
+    // saving error
+  }
+};
 
-getData("IsFirstTimeLogin").then((res)=>{
-if(res==null)
-{
-  storeData("FontConfig", {name: 'Digital', font: 'Technology-Italic', color: 'red', sizePerc: 0.2, locked: false, isSecondsVisible: false, is24hrFormat: true});
-  storeData("IsFirstTimeLogin", {value: false});
+if(needFontsReload){
+  getData("UserConfig").then((res)=>{
+    if(res==null)
+    {
+      console.log('nullconfig');
+
+      setCurrentUserConfig({name: 'Digital', font: 'Technology-Italic', color: 'red', sizePerc: 0.2, locked: false, isSecondsVisible: false, is24hrFormat: true});
+      storeData("UserConfig", currentUserConfig);
+    }
+    else
+    {
+      console.log(res);
+
+      let newCurrentUserConfig = ({name: res.name, font: res.font, color: res.color, sizePerc: res.sizePerc, locked: res.locked, isSecondsVisible: res.isSecondsVisible, is24hrFormat: res.is24hrFormat})
+      setCurrentUserConfig(newCurrentUserConfig) ;     
+      setTimerObj({name: res.name, font: res.font, color: res.color, sizePerc: res.sizePerc, locked: res.locked});
+      setIs24hrFormat(res.is24hrFormat);
+      setIsSecondsVisible(res.isSecondsVisible);
+      setNeedFontsReload(false);
+    };
+    })
 }
-else
-{
-  getData("FontConfig").then((res2)=>{
-    setTimerObj({name: res2.name, font: res2.font, color: res2.color, sizePerc: res2.sizePerc, locked: res2.locked});
-    setIs24hrFormat(res2.is24hrFormat);
-    setIsSecondsVisible(res2.isSecondsVisible);
-  }).finally(()=>{
-
-  })
-
-}
-}).finally(()=>{
-    
-  });
+      
 
 
 useEffect(() => {
@@ -120,9 +147,9 @@ const determineAndSetOrientation = () => {
 }
 
 
-getData("FontConfig").then((res3) => {
-  if(res3!=null){
-    return (
+
+if(timerObj!=null && is24hrFormat!= null && isSecondsVisible!=null){
+return (
       <View
         style={{
           flex: 1,
@@ -143,7 +170,7 @@ getData("FontConfig").then((res3) => {
             Vibration.vibrate(100); 
             setModalVisible(!modalVisible);
             }} 
-            style={[styles.timerTextSec, {display: isSecondsVisible? 'flex': 'none', width: fixedWidth * 0.95, fontSize: fixedHeight * 0.2, fontFamily: timerObj.font, color: timerObj.color }]}>
+            style={[styles.timerTextSec, {display: isSecondsVisible? 'flex': 'none', width: fixedWidth * 0.95, fontSize: fixedHeight * 0.2 * timerObj.sizePerc * 1/0.2, fontFamily: timerObj.font, color: timerObj.color }]}>
             {sec}
           </Text> 
         </View>
@@ -188,7 +215,7 @@ getData("FontConfig").then((res3) => {
               onPressOut={()=>{
                 //setModalThemeVisible(!modalThemeVisible);
               }}>
-              <View style={[styles.item, {width: fixedWidth * 0.3, borderWidth: 3, borderColor:'#2196F3', borderRadius: 20}]}>
+              <View style={[styles.item, {width: fixedWidth * 0.4, borderWidth: 3, borderColor:'#2196F3', borderRadius: 20}]}>
                   <Text style={styles.selectedTheme} >☑ Selected</Text>
                   <Text style={[styles.themeTime, {fontFamily: timerObj.font, color: timerObj.color, fontSize: fixedHeight * timerObj.sizePerc}]} >{hr} : {min}</Text>
                   <Text style={styles.themeName} >{timerObj.name}</Text>
@@ -226,6 +253,9 @@ getData("FontConfig").then((res3) => {
                   if(!item.locked){
                     setTimerObj(item);
                     setModalThemeVisible(!modalThemeVisible);
+                    let newCurrentUserConfig = ({name: item.name, font: item.font, color: item.color, sizePerc: item.sizePerc, locked: item.locked, isSecondsVisible: currentUserConfig.isSecondsVisible, is24hrFormat: currentUserConfig.is24hrFormat})
+                    setCurrentUserConfig(newCurrentUserConfig);
+                    modifyData("UserConfig", newCurrentUserConfig);
                   }
                   else
                   {
@@ -255,6 +285,5 @@ getData("FontConfig").then((res3) => {
       </View>
     );
   }
-})
-  
 }
+
