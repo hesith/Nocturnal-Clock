@@ -13,8 +13,9 @@ export const styles = StyleSheet.create({
       },
       modalView: {
         margin: 20,
-        backgroundColor: 'white',
+        backgroundColor: 'black',
         borderRadius: 20,
+        borderWidth: 2,
         padding: 20,
         alignItems: 'center',
         shadowColor: '#000',
@@ -28,31 +29,32 @@ export const styles = StyleSheet.create({
       },
       button: {
         borderRadius: 20,
-        padding: 10,
+        padding: 5,
         elevation: 2,
-        marginTop: 20
+        marginTop: 10
       },
       buttonOpen: {
         backgroundColor: '#F194FF',
       },
       buttonClose: {
-        backgroundColor: '#2196F3',
+        //backgroundColor: '#2196F3',
       },
       textStyle: {
-        color: 'white',
+        color: 'black',
         fontWeight: 'bold',
         textAlign: 'center',
       },
       modalText: {
         marginBottom: 15,
         textAlign: 'center',
+        color: 'white'
       },
       modalTextInside: {
-        textAlign: 'center',
+        textAlign: 'center',        
+        color: 'white'
       },
       
       item: {
-        backgroundColor: '#171717',
         padding: 5,
         marginVertical: 0,
         textAlign: 'center',
@@ -78,10 +80,16 @@ export const styles = StyleSheet.create({
         color: 'grey',
         alignContent:'center'
       },
+      selectedTheme: {
+        fontSize: 12,
+        textAlign: 'right',
+        color: '#2196F3',
+        alignContent:'center'
+      },
       modalView2: {
         backgroundColor: '#171717',
         borderRadius: 5,
-        padding: 2,
+        padding: 12,
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: {

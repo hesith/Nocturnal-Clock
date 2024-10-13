@@ -1,10 +1,12 @@
 import { styles } from "@/scripts/styles";
 import React, { useState, useEffect } from "react";
-import { Alert, Dimensions, Modal, Pressable, Text, Vibration, View, Switch, TouchableOpacity, SectionList, ScrollView, LogBox } from "react-native";
+import { Dimensions, Modal, Pressable, Text, Vibration, View, Switch, TouchableOpacity, SectionList, ScrollView, LogBox, Linking } from "react-native";
 import { themes } from "./themes";
-import { SafeAreaView } from "react-native-safe-area-context";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function Index() {
+
 
 const [dt, setDt] = useState(new Date().toLocaleString());
 const [yr, setYr] = useState(new Date().getFullYear().toLocaleString());
@@ -29,7 +31,44 @@ const toggle24hrSwitch = () => {
   setIs24hrFormat(previousState => !previousState);
 };
 
-const [selectedTheme, setSelectedTheme] = useState('1');
+
+const getData = async (key: string) => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(key);
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {
+    // error reading value
+  }
+};
+const storeData = async (key: string,value: any) => {
+  try {
+    const jsonValue = JSON.stringify(value);
+    await AsyncStorage.setItem(key, jsonValue);
+  } catch (e) {
+    // saving error
+  }
+};
+
+getData("IsFirstTimeLogin").then((res)=>{
+if(res==null)
+{
+  storeData("FontConfig", {name: 'Digital', font: 'Technology-Italic', color: 'red', sizePerc: 0.2, locked: false, isSecondsVisible: false, is24hrFormat: true});
+  storeData("IsFirstTimeLogin", {value: false});
+}
+else
+{
+  getData("FontConfig").then((res2)=>{
+    setTimerObj({name: res2.name, font: res2.font, color: res2.color, sizePerc: res2.sizePerc, locked: res2.locked});
+    setIs24hrFormat(res2.is24hrFormat);
+    setIsSecondsVisible(res2.isSecondsVisible);
+  }).finally(()=>{
+
+  })
+
+}
+}).finally(()=>{
+    
+  });
 
 
 useEffect(() => {
@@ -81,125 +120,141 @@ const determineAndSetOrientation = () => {
 }
 
 
-
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "black" 
-      }}
-    >
-      <View>
-        <Text onLongPress={()=> {Vibration.vibrate(100); setModalVisible(!modalVisible);}} style={[styles.timerText, {fontSize: fixedHeight * 0.65 * timerObj.sizePerc * 1/0.2, fontFamily: timerObj.font, color: timerObj.color}]}>
-          {hr} : {min}
-        </Text>
-        <Text onLongPress={()=> {Vibration.vibrate(100); setModalVisible(!modalVisible);}} style={[styles.timerTextSec, {display: isSecondsVisible? 'flex': 'none', width: fixedWidth * 0.95, fontSize: fixedHeight * 0.2, fontFamily: timerObj.font, color: timerObj.color }]}>
-          {sec}
-        </Text> 
-      </View>
-
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
-          setModalVisible(!modalVisible);
-        }}>
-        <View style={styles.centeredView}>
-          <View style={[styles.modalView, { opacity: modalThemeVisible? 0.01 : 1 }]}>
-            <Text style={styles.modalText}>Clock Settings</Text>
-
-          <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-            <Text style={styles.modalTextInside}>Show seconds  </Text>
-            <Switch
-              trackColor={{false: '#767577', true: '#81b0ff'}}
-              thumbColor={isSecondsVisible ? '#f5dd4b' : '#f4f3f4'}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={toggleSecondsSwitch}
-              value={isSecondsVisible}
-            />
-          </View>
-
-          <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-            <Text style={styles.modalTextInside}>24 Hour Format  </Text>
-            <Switch
-              trackColor={{false: '#767577', true: '#81b0ff'}}
-              thumbColor={is24hrFormat ? '#f5dd4b' : '#f4f3f4'}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={toggle24hrSwitch} 
-              value={is24hrFormat}
-            />
-          </View>
-
-          <View style={[{flexDirection: 'row', flexWrap: 'wrap'}]}>
-            <TouchableOpacity onPressIn={()=>{
-              setModalThemeVisible(!modalThemeVisible);
-            }}
-            onPressOut={()=>{
-              //setModalThemeVisible(!modalThemeVisible);
-            }}>
-              <Text style={styles.modalTextInside}>Selected Theme</Text>
-            <View style={[styles.item, {width: fixedWidth * 0.3}]}>
-                <Text style={[styles.themeTime, {fontFamily: timerObj.font, color: timerObj.color, fontSize: fixedHeight * timerObj.sizePerc}]} >{hr} : {min}</Text>
-                <Text style={styles.themeName} >{timerObj.name}</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-
-            <Pressable
-              style={[styles.button, styles.buttonClose]}
-              onPress={() => setModalVisible(!modalVisible)}>
-              <Text style={styles.textStyle}>   Okay   </Text>
-            </Pressable>
-
-          </View>
+getData("FontConfig").then((res3) => {
+  if(res3!=null){
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "black" 
+        }}
+      >
+        <View>
+          <Text onLongPress={()=> {
+            Vibration.vibrate(100); 
+            setModalVisible(!modalVisible);
+            }} 
+            style={[styles.timerText, {fontSize: fixedHeight * 0.65 * timerObj.sizePerc * 1/0.2, fontFamily: timerObj.font, color: timerObj.color}]}>
+            {hr} : {min}
+          </Text>
+          <Text onLongPress={()=> {
+            Vibration.vibrate(100); 
+            setModalVisible(!modalVisible);
+            }} 
+            style={[styles.timerTextSec, {display: isSecondsVisible? 'flex': 'none', width: fixedWidth * 0.95, fontSize: fixedHeight * 0.2, fontFamily: timerObj.font, color: timerObj.color }]}>
+            {sec}
+          </Text> 
         </View>
-      </Modal>
-
-
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalThemeVisible}
-        onRequestClose={() => {
-          Alert.alert('Modal has been closed.');
-          setModalThemeVisible(!modalThemeVisible);
-        }}>
-        <View style={styles.centeredView2}>
-          <View style={[styles.modalView2, {height: fixedHeight * 0.8 ,width: fixedWidth * 0.5}]}>
-
-          <ScrollView style={[{flexDirection: 'row', flexWrap: 'wrap', width: fixedWidth * 0.5, backgroundColor: 'black'}]}>
-          <SectionList
-            sections={themes}
-            keyExtractor={(item, index) => item.name + index}
-            renderItem={({item}) => (
-              <TouchableOpacity onPress={()=> {
-                setTimerObj(item);
+  
+  
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={[styles.modalView, { opacity: modalThemeVisible? 0.01 : 1, borderColor: timerObj.color }]}>
+  
+            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+              <Text style={styles.modalTextInside}>Show seconds  </Text>
+              <Switch
+                trackColor={{false: '#767577', true: '#81b0ff'}}
+                thumbColor={isSecondsVisible ? '#f5dd4b' : '#f4f3f4'}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={toggleSecondsSwitch}
+                value={isSecondsVisible}
+              />
+            </View>
+  
+            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+              <Text style={styles.modalTextInside}>24 Hour Format  </Text>
+              <Switch
+                trackColor={{false: '#767577', true: '#81b0ff'}}
+                thumbColor={is24hrFormat ? '#f5dd4b' : '#f4f3f4'}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={toggle24hrSwitch} 
+                value={is24hrFormat}
+              />
+            </View>
+  
+            <View style={[{flexDirection: 'row', flexWrap: 'wrap'}]}>
+              <TouchableOpacity onPressIn={()=>{
                 setModalThemeVisible(!modalThemeVisible);
-                }}>
-              <View style={[styles.item, {width: fixedWidth * 0.5, borderWidth: (timerObj.font==item.font) ? 2 : 0, borderColor: timerObj.color}]}>
-              <Text style={[styles.Pro, {display: item.locked ? 'flex' : 'none'}]} >Pro Version 👑</Text>
-                <Text style={[styles.themeTime, {fontFamily: item.font, color: item.color, fontSize: fixedHeight * item.sizePerc}]} >{hr} : {min}</Text>
-                
-                <Text style={styles.themeName} >{item.name}</Text>
-              </View>
+              }}
+              onPressOut={()=>{
+                //setModalThemeVisible(!modalThemeVisible);
+              }}>
+              <View style={[styles.item, {width: fixedWidth * 0.3, borderWidth: 3, borderColor:'#2196F3', borderRadius: 20}]}>
+                  <Text style={styles.selectedTheme} >☑ Selected</Text>
+                  <Text style={[styles.themeTime, {fontFamily: timerObj.font, color: timerObj.color, fontSize: fixedHeight * timerObj.sizePerc}]} >{hr} : {min}</Text>
+                  <Text style={styles.themeName} >{timerObj.name}</Text>
+                </View>
               </TouchableOpacity>
-
-            )}
-            renderSectionHeader={({section: {title}}) => (
-              <Text style={styles.header}>{title}</Text>
-            )}
-          />
-          </ScrollView>
+            </View>
+  
+              <Pressable
+                style={[styles.button, styles.buttonClose, {width: fixedWidth * 0.3, backgroundColor: timerObj.color}]}
+                onPress={() => setModalVisible(!modalVisible)}>
+                <Text style={styles.textStyle}>   Okay   </Text>
+              </Pressable>
+  
+            </View>
           </View>
-        </View>
-      </Modal>
-
-
-    </View>
-  );
+        </Modal>
+  
+  
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={modalThemeVisible}
+          onRequestClose={() => {
+            setModalThemeVisible(!modalThemeVisible);
+          }}>
+          <View style={styles.centeredView2}>
+            <View style={[styles.modalView2, {height: fixedHeight * 0.8 ,width: fixedWidth * 0.5, borderColor: timerObj.color, borderBottomWidth: 2}]}>
+  
+            <ScrollView style={[{flexDirection: 'row', flexWrap: 'wrap', width: fixedWidth * 0.5, backgroundColor: 'black'}]}>
+            <SectionList
+              sections={themes}
+              keyExtractor={(item, index) => item.name + index}
+              renderItem={({item}) => (
+                <TouchableOpacity onPress={()=> {
+                  if(!item.locked){
+                    setTimerObj(item);
+                    setModalThemeVisible(!modalThemeVisible);
+                  }
+                  else
+                  {
+                    Linking.openURL("market://details?id=com.phantomHookLabs.nocturnalClockPro");
+                  }
+                  }}>
+                <View style={[styles.item, {width: fixedWidth * 0.5, borderWidth: (timerObj.font==item.font) ? 2 : 0, borderColor: timerObj.color, backgroundColor: item.locked? '#171717' : 'black'}]}>
+                <Text style={[styles.Pro, {display: item.locked ? 'flex' : 'none'}]} >Pro Version 👑</Text>
+                <Text style={[styles.Pro, {display: !item.locked ? 'flex' : 'none'}]} >Free</Text>
+                  <Text style={[styles.themeTime, {fontFamily: item.font, color: item.color, fontSize: fixedHeight * item.sizePerc}]} >{hr} : {min}</Text>
+                  
+                  <Text style={styles.themeName} >{item.name}</Text>
+                </View>
+                </TouchableOpacity>
+  
+              )}
+              renderSectionHeader={({section: {title}}) => (
+                <Text style={styles.header}>{title}</Text>
+              )}
+            />
+            </ScrollView>
+            </View>
+          </View>
+        </Modal>
+  
+  
+      </View>
+    );
+  }
+})
+  
 }
