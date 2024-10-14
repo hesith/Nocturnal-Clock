@@ -1,8 +1,9 @@
 import { styles } from "@/scripts/styles";
 import React, { useState, useEffect } from "react";
-import { Dimensions, Modal, Pressable, Text, Vibration, View, Switch, TouchableOpacity, SectionList, ScrollView, LogBox, Linking } from "react-native";
+import { Dimensions, Modal, Pressable, Text, Vibration, View, Switch, TouchableOpacity, SectionList, ScrollView, LogBox, Linking, Alert, ToastAndroid } from "react-native";
 import { themes } from "./themes";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 
 
 export default function Index() {
@@ -21,6 +22,7 @@ const [modalVisible, setModalVisible] = useState(false);
 const [modalThemeVisible, setModalThemeVisible] = useState(false);
 const [timerObj, setTimerObj] = useState<any>(null);
 
+
 const [needFontsReload, setNeedFontsReload] = useState(true);
 
 const [currentUserConfig, setCurrentUserConfig] = useState<any>(null);
@@ -28,7 +30,7 @@ const [currentUserConfig, setCurrentUserConfig] = useState<any>(null);
 
 const [isSecondsVisible, setIsSecondsVisible] = useState<any>(null);
 const toggleSecondsSwitch = () => {
-  let newCurrentUserConfig = ({name: currentUserConfig.name, font: currentUserConfig.font, color: currentUserConfig.color, sizePerc: currentUserConfig.sizePerc, locked: currentUserConfig.locked, isSecondsVisible: !isSecondsVisible, is24hrFormat: currentUserConfig.is24hrFormat})
+  let newCurrentUserConfig = ({name: currentUserConfig.name, font: currentUserConfig.font, color: currentUserConfig.color, sizePerc: currentUserConfig.sizePerc, locked: currentUserConfig.locked, isSecondsVisible: !isSecondsVisible, is24hrFormat: currentUserConfig.is24hrFormat, isAwake: currentUserConfig.isAwake})
   setCurrentUserConfig(newCurrentUserConfig);
   modifyData("UserConfig", newCurrentUserConfig);
 
@@ -38,7 +40,7 @@ const toggleSecondsSwitch = () => {
 
 const [is24hrFormat, setIs24hrFormat] = useState<any>(null);
 const toggle24hrSwitch = () => {
-  let newCurrentUserConfig = ({name: currentUserConfig.name, font: currentUserConfig.font, color: currentUserConfig.color, sizePerc: currentUserConfig.sizePerc, locked: currentUserConfig.locked, isSecondsVisible: currentUserConfig.isSecondsVisible, is24hrFormat: !is24hrFormat})
+  let newCurrentUserConfig = ({name: currentUserConfig.name, font: currentUserConfig.font, color: currentUserConfig.color, sizePerc: currentUserConfig.sizePerc, locked: currentUserConfig.locked, isSecondsVisible: currentUserConfig.isSecondsVisible, is24hrFormat: !is24hrFormat, isAwake: currentUserConfig.isAwake})
   setCurrentUserConfig(newCurrentUserConfig);
   modifyData("UserConfig", newCurrentUserConfig);
 
@@ -47,6 +49,24 @@ const toggle24hrSwitch = () => {
 };
 
 
+const [isKeepAwake, setIsKeepAwake] = useState<any>(null);
+const toggleKeepAwakeSwitch = () => {
+  if(!isKeepAwake)
+  {
+    activateKeepAwakeAsync();
+  }
+  else
+  {
+    deactivateKeepAwake();
+  }
+
+  let newCurrentUserConfig = ({name: currentUserConfig.name, font: currentUserConfig.font, color: currentUserConfig.color, sizePerc: currentUserConfig.sizePerc, locked: currentUserConfig.locked, isSecondsVisible: currentUserConfig.isSecondsVisible, is24hrFormat: currentUserConfig.is24hrFormat, isAwake: !isKeepAwake})
+  setCurrentUserConfig(newCurrentUserConfig);
+  modifyData("UserConfig", newCurrentUserConfig);
+
+  setIsKeepAwake((previousState: any) => !previousState);
+  setTimerObj(currentUserConfig);
+};
 
 const getData = async (key: string) => {
   try {
@@ -77,27 +97,34 @@ if(needFontsReload){
   getData("UserConfig").then((res)=>{
     if(res==null)
     {
-      console.log('nullconfig');
-
-      setCurrentUserConfig({name: 'Digital', font: 'Technology-Italic', color: 'red', sizePerc: 0.2, locked: false, isSecondsVisible: false, is24hrFormat: true});
+      setCurrentUserConfig({name: 'Digital', font: 'Technology-Italic', color: 'red', sizePerc: 0.2, locked: false, isSecondsVisible: false, is24hrFormat: true, isAwake: true});
       storeData("UserConfig", currentUserConfig);
     }
     else
     {
       console.log(res);
 
-      let newCurrentUserConfig = ({name: res.name, font: res.font, color: res.color, sizePerc: res.sizePerc, locked: res.locked, isSecondsVisible: res.isSecondsVisible, is24hrFormat: res.is24hrFormat})
+      let newCurrentUserConfig = ({name: res.name, font: res.font, color: res.color, sizePerc: res.sizePerc, locked: res.locked, isSecondsVisible: res.isSecondsVisible, is24hrFormat: res.is24hrFormat, isAwake:res.isAwake})
       setCurrentUserConfig(newCurrentUserConfig) ;     
       setTimerObj({name: res.name, font: res.font, color: res.color, sizePerc: res.sizePerc, locked: res.locked});
       setIs24hrFormat(res.is24hrFormat);
       setIsSecondsVisible(res.isSecondsVisible);
+      setIsKeepAwake(res.isAwake);
+
+      if(res.isAwake)
+        {
+          activateKeepAwakeAsync();
+        }
+        else
+        {
+          deactivateKeepAwake();
+        }
+
       setNeedFontsReload(false);
     };
     })
 }
       
-
-
 useEffect(() => {
     let secTimer = setInterval( () => {
       var dateTime = new Date();
@@ -146,9 +173,11 @@ const determineAndSetOrientation = () => {
     }
 }
 
+const showToast = () => {
+  ToastAndroid.show('Hold to open Settings!', ToastAndroid.SHORT);
+};
 
-
-if(timerObj!=null && is24hrFormat!= null && isSecondsVisible!=null){
+if(timerObj!=null && is24hrFormat!= null && isSecondsVisible!=null && isKeepAwake!=null){
 return (
       <View
         style={{
@@ -163,6 +192,7 @@ return (
             Vibration.vibrate(100); 
             setModalVisible(!modalVisible);
             }} 
+            onPress={()=> showToast()}
             style={[styles.timerText, {fontSize: fixedHeight * 0.65 * timerObj.sizePerc * 1/0.2, fontFamily: timerObj.font, color: timerObj.color}]}>
             {hr} : {min}
           </Text>
@@ -170,6 +200,7 @@ return (
             Vibration.vibrate(100); 
             setModalVisible(!modalVisible);
             }} 
+            onPress={()=> showToast()}
             style={[styles.timerTextSec, {display: isSecondsVisible? 'flex': 'none', width: fixedWidth * 0.95, fontSize: fixedHeight * 0.2 * timerObj.sizePerc * 1/0.2, fontFamily: timerObj.font, color: timerObj.color }]}>
             {sec}
           </Text> 
@@ -185,9 +216,9 @@ return (
           }}>
           <View style={styles.centeredView}>
             <View style={[styles.modalView, { opacity: modalThemeVisible? 0.01 : 1, borderColor: timerObj.color }]}>
-  
+
             <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-              <Text style={styles.modalTextInside}>Show seconds  </Text>
+              <Text style={styles.modalTextInside}>Show Seconds  </Text>
               <Switch
                 trackColor={{false: '#767577', true: '#2196F3'}}
                 thumbColor={isSecondsVisible ? timerObj.color : '#f4f3f4'}
@@ -205,6 +236,17 @@ return (
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={toggle24hrSwitch} 
                 value={is24hrFormat}
+              />
+            </View>
+
+            <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+              <Text style={styles.modalTextInside}>Keep Screen Awake  </Text>
+              <Switch
+                trackColor={{false: '#767577', true: '#2196F3'}}
+                thumbColor={isKeepAwake ? timerObj.color : '#f4f3f4'}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={toggleKeepAwakeSwitch} 
+                value={isKeepAwake}
               />
             </View>
   
@@ -253,7 +295,7 @@ return (
                   if(!item.locked){
                     setTimerObj(item);
                     setModalThemeVisible(!modalThemeVisible);
-                    let newCurrentUserConfig = ({name: item.name, font: item.font, color: item.color, sizePerc: item.sizePerc, locked: item.locked, isSecondsVisible: currentUserConfig.isSecondsVisible, is24hrFormat: currentUserConfig.is24hrFormat})
+                    let newCurrentUserConfig = ({name: item.name, font: item.font, color: item.color, sizePerc: item.sizePerc, locked: item.locked, isSecondsVisible: currentUserConfig.isSecondsVisible, is24hrFormat: currentUserConfig.is24hrFormat, isAwake: currentUserConfig.isAwake})
                     setCurrentUserConfig(newCurrentUserConfig);
                     modifyData("UserConfig", newCurrentUserConfig);
                   }
