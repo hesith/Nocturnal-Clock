@@ -1,6 +1,6 @@
 import { styles } from "@/scripts/styles";
 import React, { useState, useEffect } from "react";
-import { Dimensions, Modal, Pressable, Text, Vibration, View, Switch, TouchableOpacity, SectionList, ScrollView, LogBox, Linking, Alert, ToastAndroid } from "react-native";
+import { Dimensions, Modal, Pressable, Text, Vibration, View, Switch, TouchableOpacity, SectionList, ScrollView, LogBox, Linking, Alert, ToastAndroid, Button } from "react-native";
 import { themes } from "./themes";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
@@ -24,6 +24,7 @@ const [timerObj, setTimerObj] = useState<any>(null);
 
 
 const [needFontsReload, setNeedFontsReload] = useState(true);
+const [toasterShown, setToasterShown] = useState(false);
 
 const [currentUserConfig, setCurrentUserConfig] = useState<any>(null);
 
@@ -99,11 +100,10 @@ if(needFontsReload){
     {
       setCurrentUserConfig({name: 'Digital', font: 'Technology-Italic', color: 'red', sizePerc: 0.2, locked: false, isSecondsVisible: false, is24hrFormat: true, isAwake: true});
       storeData("UserConfig", currentUserConfig);
+ 
     }
     else
     {
-      console.log(res);
-
       let newCurrentUserConfig = ({name: res.name, font: res.font, color: res.color, sizePerc: res.sizePerc, locked: res.locked, isSecondsVisible: res.isSecondsVisible, is24hrFormat: res.is24hrFormat, isAwake:res.isAwake})
       setCurrentUserConfig(newCurrentUserConfig) ;     
       setTimerObj({name: res.name, font: res.font, color: res.color, sizePerc: res.sizePerc, locked: res.locked});
@@ -121,6 +121,8 @@ if(needFontsReload){
         }
 
       setNeedFontsReload(false);
+
+    
     };
     })
 }
@@ -155,7 +157,7 @@ useEffect(() => {
   }
 }, []);
 
-useEffect(() => {
+useEffect(() => { 
   LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
 }, [])
 
@@ -174,10 +176,22 @@ const determineAndSetOrientation = () => {
 }
 
 const showToast = () => {
-  ToastAndroid.show('Hold to open Settings!', ToastAndroid.SHORT);
+  ToastAndroid.show('Touch and hold time indicator to open Settings !', ToastAndroid.SHORT);
 };
 
+const showToastLonger = () => {
+  if(!toasterShown){
+    setTimeout(() => {
+      ToastAndroid.showWithGravity('Touch and hold time indicator to open Settings !', ToastAndroid.LONG, ToastAndroid.TOP);
+    }, 1000);
+    setToasterShown(true);
+  }
+};
+showToastLonger();
+
 if(timerObj!=null && is24hrFormat!= null && isSecondsVisible!=null && isKeepAwake!=null){
+
+
 return (
       <View
         style={{
@@ -214,6 +228,7 @@ return (
           onRequestClose={() => {
             setModalVisible(!modalVisible);
           }}>
+
           <View style={styles.centeredView}>
             <View style={[styles.modalView, { opacity: modalThemeVisible? 0.01 : 1, borderColor: timerObj.color }]}>
 
@@ -283,7 +298,11 @@ return (
           onRequestClose={() => {
             setModalThemeVisible(!modalThemeVisible);
           }}>
-          <View style={styles.centeredView2}>
+          <View style={[styles.centeredView2]}>
+            <View style={{width: fixedWidth * 0.5, alignItems: 'flex-end'}}>
+              <Text onPress={()=>setModalThemeVisible(false)} style={[styles.modalCloseBtn, {fontSize: fixedHeight * 0.03, color: timerObj.color,width: 'auto', borderWidth: 1, borderColor: timerObj.color, borderRadius: 15, paddingHorizontal: 10}]}>❌Close</Text>
+            </View>
+
             <View style={[styles.modalView2, {height: fixedHeight * 0.8 ,width: fixedWidth * 0.5, borderColor: timerObj.color, borderBottomWidth: 2}]}>
   
             <ScrollView style={[{flexDirection: 'row', flexWrap: 'wrap', width: fixedWidth * 0.5, backgroundColor: 'black'}]}>

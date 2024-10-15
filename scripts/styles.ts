@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
       },
       modalView: {
-        margin: 20,
+        margin: 20, 
         backgroundColor: 'black',
         borderRadius: 20,
         borderWidth: 2,
@@ -53,11 +53,13 @@ export const styles = StyleSheet.create({
         textAlign: 'center',        
         color: 'white'
       },
-      
       item: {
         padding: 5,
         marginVertical: 0,
         textAlign: 'center',
+      },
+      modalCloseBtn: {
+        textAlign: 'right',        
       },
       header: {
         fontSize: 24,

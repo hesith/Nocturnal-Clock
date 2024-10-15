@@ -42,7 +42,7 @@
             "./assets/fonts/good times rg.otf",
             "./assets/fonts/HarryP-MVZ6w.ttf",
             "./assets/fonts/HOMOARAK.ttf",
-            "./assets/fonts/If.ttf",
+            "./assets/fonts/decrepit.ttf",
             "./assets/fonts/Kamikaze3DGradient.ttf",
             "./assets/fonts/LeagueGothic-Regular.otf",
             "./assets/fonts/LUMOS.ttf",
@@ -50,12 +50,12 @@
             "./assets/fonts/MISTV___.ttf",
             "./assets/fonts/Monoton-Regular.ttf",
             "./assets/fonts/musicals.ttf",
-            "./assets/fonts/papercut.ttf",
             "./assets/fonts/ParkLaneNF.ttf",
             "./assets/fonts/peach-sundress.ttf",
             "./assets/fonts/shlop rg.otf",
             "./assets/fonts/Ubuntu-R.ttf",
-            "./assets/fonts/Westerngames Regular.ttf"
+            "./assets/fonts/Westerngames Regular.ttf",
+            "./assets/fonts/CabinSketch-Regular.ttf"
 
           ]
         }
