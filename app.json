@@ -16,7 +16,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.phantomHookLabs.nocturnalClock",
-      "versionCode": 2
+      "versionCode": 3
     },
     "web": {
       "bundler": "metro",
@@ -30,7 +30,6 @@
         {
           "fonts": [
             "./assets/fonts/Technology-Italic.ttf",
-            "./assets/fonts/Architex.ttf",
             "./assets/fonts/Beyond Wonderland.ttf",
             "./assets/fonts/BLKCHCRY.ttf",
             "./assets/fonts/BRICK.ttf",

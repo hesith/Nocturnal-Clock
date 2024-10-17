@@ -1,7 +1,8 @@
 import { styles } from "@/scripts/styles";
 import React, { useState, useEffect } from "react";
-import { Dimensions, Modal, Pressable, Text, Vibration, View, Switch, TouchableOpacity, SectionList, ScrollView, LogBox, Linking, Alert, ToastAndroid, Button } from "react-native";
+import { Dimensions, Modal, Pressable, Text, Vibration, View, Switch, TouchableOpacity, SectionList, ScrollView, LogBox, Linking, Alert, ToastAndroid, Button, FlatList } from "react-native";
 import { themes } from "./themes";
+import { subThemes } from "./subThemes";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 
@@ -189,6 +190,10 @@ const showToastLonger = () => {
 };
 showToastLonger();
 
+function getThemeColor(){
+  return 'white';
+}
+
 if(timerObj!=null && is24hrFormat!= null && isSecondsVisible!=null && isKeepAwake!=null){
 
 
@@ -275,17 +280,47 @@ return (
               <View style={[styles.item, {width: fixedWidth * 0.4, borderWidth: 3, borderColor:'#2196F3', borderRadius: 20}]}>
                   <Text style={styles.selectedTheme} >☑ Selected</Text>
                   <Text style={[styles.themeTime, {fontFamily: timerObj.font, color: timerObj.color, fontSize: fixedHeight * timerObj.sizePerc}]} >{hr} : {min}</Text>
+                  
+
+                  <View style={{flexDirection: "row"}}>
                   <Text style={styles.themeName} >{timerObj.name}</Text>
+                  <FlatList
+                      inverted
+                      style={styles.subThemesList}
+                      horizontal
+                      data={subThemes}
+                      renderItem={(subItem) => (
+                        <TouchableOpacity style={{display: (subItem.item.name == timerObj.name) ? 'flex':'none', flexDirection:'column'}} 
+                        onPress={()=>{
+                          let newCurrentUserConfig = ({name: currentUserConfig.name, font: currentUserConfig.font, color: subItem.item.color, sizePerc: currentUserConfig.sizePerc, locked: currentUserConfig.locked, isSecondsVisible: currentUserConfig.isSecondsVisible, is24hrFormat: currentUserConfig.is24hrFormat, isAwake: currentUserConfig.isAwake});
+                          setCurrentUserConfig(newCurrentUserConfig);
+                          modifyData("UserConfig", newCurrentUserConfig);
+                          setTimerObj(newCurrentUserConfig);
+                        }}>
+                            <Text style={[styles.subTheme,{backgroundColor:subItem.item.color, borderColor: timerObj.color}]} >     </Text>
+                        </TouchableOpacity>
+                      )}
+                      keyExtractor={item => item.id}
+                    />
+                  </View>
                 </View>
               </TouchableOpacity>
             </View>
   
+          <View style={{flexDirection: 'row'}}>
+            <Pressable
+                style={[styles.button, styles.buttonClose, {width: fixedWidth * 0.1, backgroundColor: timerObj.color}]}
+                onPress={() => {
+                  Linking.openURL('mailto:phantomhooklabs@gmail.com?subject=Regarding Nocturnal Clock'); 
+                }}>
+                <Text style={styles.textStyle}>  Feedback  </Text>
+              </Pressable>
               <Pressable
                 style={[styles.button, styles.buttonClose, {width: fixedWidth * 0.3, backgroundColor: timerObj.color}]}
                 onPress={() => setModalVisible(!modalVisible)}>
                 <Text style={styles.textStyle}>   Okay   </Text>
               </Pressable>
-  
+              </View>
             </View>
           </View>
         </Modal>
@@ -310,11 +345,12 @@ return (
               sections={themes}
               keyExtractor={(item, index) => item.name + index}
               renderItem={({item}) => (
-                <TouchableOpacity onPress={()=> {
+                
+                <TouchableOpacity onPress={()=> {               
                   if(!item.locked){
                     setTimerObj(item);
                     setModalThemeVisible(!modalThemeVisible);
-                    let newCurrentUserConfig = ({name: item.name, font: item.font, color: item.color, sizePerc: item.sizePerc, locked: item.locked, isSecondsVisible: currentUserConfig.isSecondsVisible, is24hrFormat: currentUserConfig.is24hrFormat, isAwake: currentUserConfig.isAwake})
+                    let newCurrentUserConfig = ({name: item.name, font: item.font, color: item.color, sizePerc: item.sizePerc, locked: item.locked, isSecondsVisible: currentUserConfig.isSecondsVisible, is24hrFormat: currentUserConfig.is24hrFormat, isAwake: currentUserConfig.isAwake});
                     setCurrentUserConfig(newCurrentUserConfig);
                     modifyData("UserConfig", newCurrentUserConfig);
                   }
@@ -326,9 +362,14 @@ return (
                 <View style={[styles.item, {width: fixedWidth * 0.5, borderWidth: (timerObj.font==item.font) ? 2 : 0, borderColor: timerObj.color, backgroundColor: item.locked? '#171717' : 'black'}]}>
                 <Text style={[styles.Pro, {display: item.locked ? 'flex' : 'none'}]} >Pro Version 👑</Text>
                 <Text style={[styles.Pro, {display: !item.locked ? 'flex' : 'none'}]} >Free</Text>
-                  <Text style={[styles.themeTime, {fontFamily: item.font, color: item.color, fontSize: fixedHeight * item.sizePerc}]} >{hr} : {min}</Text>
+                <Text style={[styles.themeTime, {fontFamily: item.font, color: item.color, fontSize: fixedHeight * item.sizePerc}]} >{hr} : {min}</Text>
                   
+                <View style={{flexDirection: 'row'}}>
+
                   <Text style={styles.themeName} >{item.name}</Text>
+                  
+                </View>
+
                 </View>
                 </TouchableOpacity>
   

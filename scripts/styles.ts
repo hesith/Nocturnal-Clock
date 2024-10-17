@@ -31,7 +31,8 @@ export const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 5,
         elevation: 2,
-        marginTop: 10
+        marginTop: 10,
+        marginLeft: 5
       },
       buttonOpen: {
         backgroundColor: '#F194FF',
@@ -75,6 +76,19 @@ export const styles = StyleSheet.create({
         fontSize: 12,
         textAlign: 'left',
         color: 'grey',
+        textAlignVertical: 'center'
+      },
+      subThemesList: {
+        fontSize: 12,
+        textAlign: 'right',
+        color: 'grey',
+        flex: 1,
+      }, 
+      subTheme: {
+        fontSize: 12,
+        marginHorizontal: 5,
+        borderRadius: 50,
+        borderWidth: 2
       },
       Pro: {
         fontSize: 12,
