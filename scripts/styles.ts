@@ -88,7 +88,6 @@ export const styles = StyleSheet.create({
         fontSize: 12,
         marginHorizontal: 5,
         borderRadius: 50,
-        borderWidth: 2
       },
       Pro: {
         fontSize: 12,

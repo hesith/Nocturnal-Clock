@@ -190,8 +190,39 @@ const showToastLonger = () => {
 };
 showToastLonger();
 
-function getThemeColor(){
-  return 'white';
+function getSubThemes (name : string, isViewOnly : boolean) {  
+  if(isViewOnly){
+    return (
+      <FlatList
+      inverted
+      style={styles.subThemesList}
+      horizontal
+      data={subThemes(name.toString())}
+      renderItem={(subItem) => (                
+            <Text style={[styles.subTheme, {backgroundColor: subItem.item, borderColor: timerObj.color, borderWidth: 0 }]} >     </Text>
+      )}
+    />)
+  }else{
+    return(
+    <FlatList
+      inverted
+      style={styles.subThemesList}
+      horizontal
+      data={subThemes(name.toString())}
+      renderItem={(subItem) => (
+        <TouchableOpacity style={{flexDirection:'column'}} 
+        onPress={()=>{
+          let newCurrentUserConfig = ({name: currentUserConfig.name, font: currentUserConfig.font, color: subItem.item, sizePerc: currentUserConfig.sizePerc, locked: currentUserConfig.locked, isSecondsVisible: currentUserConfig.isSecondsVisible, is24hrFormat: currentUserConfig.is24hrFormat, isAwake: currentUserConfig.isAwake});
+          setCurrentUserConfig(newCurrentUserConfig);
+          modifyData("UserConfig", newCurrentUserConfig);
+          setTimerObj(newCurrentUserConfig);
+        }}>
+            <Text style={[styles.subTheme,{backgroundColor:subItem.item, borderColor: timerObj.color, borderWidth: 2}]} >     </Text>
+        </TouchableOpacity>
+      )}
+    />)
+  }
+  
 }
 
 if(timerObj!=null && is24hrFormat!= null && isSecondsVisible!=null && isKeepAwake!=null){
@@ -284,7 +315,10 @@ return (
 
                   <View style={{flexDirection: "row"}}>
                   <Text style={styles.themeName} >{timerObj.name}</Text>
-                  <FlatList
+
+                  {getSubThemes(timerObj.name, false)}
+
+                  {/* <FlatList
                       inverted
                       style={styles.subThemesList}
                       horizontal
@@ -301,7 +335,7 @@ return (
                         </TouchableOpacity>
                       )}
                       keyExtractor={item => item.id}
-                    />
+                    /> */}
                   </View>
                 </View>
               </TouchableOpacity>
@@ -341,8 +375,8 @@ return (
             <View style={[styles.modalView2, {height: fixedHeight * 0.8 ,width: fixedWidth * 0.5, borderColor: timerObj.color, borderBottomWidth: 2}]}>
   
             <ScrollView style={[{flexDirection: 'row', flexWrap: 'wrap', width: fixedWidth * 0.5, backgroundColor: 'black'}]}>
-            <SectionList
-              sections={themes}
+            <FlatList
+              data={themes}
               keyExtractor={(item, index) => item.name + index}
               renderItem={({item}) => (
                 
@@ -367,16 +401,25 @@ return (
                 <View style={{flexDirection: 'row'}}>
 
                   <Text style={styles.themeName} >{item.name}</Text>
-                  
+                  {getSubThemes(item.name, true)}
+
+                  {/* <FlatList
+                      inverted
+                      style={styles.subThemesList}
+                      horizontal
+                      data={subThemes}
+                      renderItem={(subItem) => (                
+                            <Text style={[styles.subTheme,{display: (subItem.item.name == item.name) ? 'flex':'none',backgroundColor:subItem.item.color, borderColor: timerObj.color}]} >     </Text>
+                      )}
+                      keyExtractor={item => item.id}
+                    /> */}
                 </View>
 
                 </View>
                 </TouchableOpacity>
   
               )}
-              renderSectionHeader={({section: {title}}) => (
-                <Text style={styles.header}>{title}</Text>
-              )}
+       
             />
             </ScrollView>
             </View>

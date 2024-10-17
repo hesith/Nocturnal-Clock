@@ -1,4 +1,36 @@
 
+
+export function subThemes(themeName : string) {
+  switch (themeName){
+    case 'Digital': return(['#0011e3','#00d9e3','red']);
+    case 'Wonderland': return(['#ee9aff','#7343cb']);
+    case 'Royale': return(['silver','gold']);
+    case 'Brick': return(['#f8471f','#b60000','#812727']);
+    case 'Vegas': return(['#ff8c1a','#b4a78c']);
+    case 'Bulletin': return(['silver']);
+    case 'Blockbuster': return(['silver']);
+    case 'Sandbox': return(['green','#979797']);
+    case 'Artist': return(['#0074f7','#ccbe51','#dc84f3']);
+    case 'Visualize': return(['white']);
+    case 'Leviosa': return(['gold','silver']);
+    case 'Web': return(['silver']);
+    case 'Outbreak': return(['silver','#850000']);
+    case 'Arcade': return(['#00c3c3','#cac300','#bb00ca']);
+    case 'Clean': return(['gold','silver']);
+    case 'Mischief': return(['#9d6100','#737373']);
+    case 'Retro': return(['#cc3138','#85bdbc','#8985bd','#cad15a']);
+    case 'Stones': return(['#bbb295','#d47fd9']);
+    case 'Mono': return(['#473b62','#023507','#4d4d4d']);
+    case 'Clef': return(['#1c158b','#4c004f']);
+    case 'Elegant': return(['silver','gold']);
+    case 'Bookaholic': return(['#e7aaff','#ccd543']);
+    case 'Amityville': return(['red','#660e00','#197700']);
+    case 'Sudo': return(['#e54500','white']);
+    case 'Bounty': return(['grey','#8f0000']);
+
+  }
+  
+}/*
 export const subThemes = [
   { id:'Digital0', name: 'Digital', color: 'red'},
   { id:'Digital1', name: 'Digital', color: '#00d9e3'},
@@ -79,4 +111,4 @@ export const subThemes = [
   { id:'Bounty0', name: 'Bounty', color: 'grey'},
   { id:'Bounty1', name: 'Bounty', color: '#8f0000'},
 
-];
+];*/
