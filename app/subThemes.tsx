@@ -2,7 +2,7 @@
 
 export function subThemes(themeName : string) {
   switch (themeName){
-    case 'Digital': return(['#0011e3','#00d9e3','red']);
+    case 'Digital': return(['#0011e3','#2cee35','red']);
     case 'Wonderland': return(['#ee9aff','#7343cb']);
     case 'Royale': return(['silver','gold']);
     case 'Brick': return(['#f8471f','#b60000','#812727']);
@@ -10,8 +10,8 @@ export function subThemes(themeName : string) {
     case 'Bulletin': return(['silver']);
     case 'Blockbuster': return(['silver']);
     case 'Sandbox': return(['green','#979797']);
-    case 'Artist': return(['#0074f7','#ccbe51','#dc84f3']);
-    case 'Visualize': return(['white']);
+    case 'Artist': return(['#0074f7','#00d9e3','#dc84f3']);
+    case 'Visualize': return(['#00d9e3']);
     case 'Leviosa': return(['gold','silver']);
     case 'Web': return(['silver']);
     case 'Outbreak': return(['silver','#850000']);
@@ -19,7 +19,7 @@ export function subThemes(themeName : string) {
     case 'Clean': return(['gold','silver']);
     case 'Mischief': return(['#9d6100','#737373']);
     case 'Retro': return(['#cc3138','#85bdbc','#8985bd','#cad15a']);
-    case 'Stones': return(['#bbb295','#d47fd9']);
+    case 'Stones': return(['#bbb295','#ff8c1a']);
     case 'Mono': return(['#473b62','#023507','#4d4d4d']);
     case 'Clef': return(['#1c158b','#4c004f']);
     case 'Elegant': return(['silver','gold']);
