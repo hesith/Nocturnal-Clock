@@ -16,7 +16,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.phantomHookLabs.nocturnalClock",
-      "versionCode": 4
+      "versionCode": 5
     },
     "web": {
       "bundler": "metro",

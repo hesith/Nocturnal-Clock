@@ -244,8 +244,7 @@ return (
             }} 
             onPress={()=> showToast()}
             style={[styles.timerText, {fontSize: fixedHeight * 0.65 * timerObj.sizePerc * 1/0.2, fontFamily: timerObj.font, color: timerObj.color}]}>
-            {/* {hr} : {min} */}
-            12 : 12
+            {hr} : {min}
           </Text>
           <Text onLongPress={()=> {
             Vibration.vibrate(100); 
