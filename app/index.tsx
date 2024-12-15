@@ -6,6 +6,8 @@ import { subThemes } from "./subThemes";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 
+import { AppState, AppStateStatus } from "react-native";
+import { showAppOpenAd, loadAppOpenAd } from "./AppOpenAd";
 
 export default function Index() {
 
@@ -156,6 +158,23 @@ useEffect(() => {
   return () => {
     listener.remove();
   }
+
+}, []);
+
+useEffect(() => {
+  //
+  const handleAppStateChange = (nextAppState: AppStateStatus) => {
+    if (nextAppState === 'active') {
+      showAppOpenAd(); // Show the ad when the app becomes active
+    }
+  };
+
+  const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+  loadAppOpenAd(); // Load the ad on initial app load
+
+  return () => subscription.remove();
+  //
 }, []);
 
 useEffect(() => { 
@@ -343,14 +362,14 @@ return (
   
           <View style={{flexDirection: 'row'}}>
             <Pressable
-                style={[styles.button, styles.buttonClose, {width: fixedWidth * 0.1, backgroundColor: timerObj.color}]}
+                style={[styles.button, styles.buttonClose, {width: fixedWidth * 0.18, backgroundColor: timerObj.color}]}
                 onPress={() => {
                   Linking.openURL('mailto:phantomhooklabs@gmail.com?subject=Regarding Nocturnal Clock'); 
                 }}>
                 <Text style={styles.textStyle}>  Feedback  </Text>
               </Pressable>
               <Pressable
-                style={[styles.button, styles.buttonClose, {width: fixedWidth * 0.3, backgroundColor: timerObj.color}]}
+                style={[styles.button, styles.buttonClose, {width: fixedWidth * 0.22, backgroundColor: timerObj.color}]}
                 onPress={() => setModalVisible(!modalVisible)}>
                 <Text style={styles.textStyle}>   Okay   </Text>
               </Pressable>

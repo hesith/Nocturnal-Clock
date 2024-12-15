@@ -16,7 +16,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.phantomHookLabs.nocturnalClock",
-      "versionCode": 5
+      "versionCode": 7
     },
     "web": {
       "bundler": "metro",
@@ -74,5 +74,8 @@
         "projectId": "4669501a-3607-4d06-b8de-fd0dc3f4480b"
       }
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-1726341387159051~7413760662"
   }
 }
