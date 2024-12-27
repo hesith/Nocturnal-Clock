@@ -2,7 +2,7 @@
   "expo": {
     "name": "Nocturnal Clock",
     "slug": "nocturnalClock",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "landscape",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -16,7 +16,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.phantomHookLabs.nocturnalClock",
-      "versionCode": 7
+      "versionCode": 8
     },
     "web": {
       "bundler": "metro",
