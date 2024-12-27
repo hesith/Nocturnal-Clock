@@ -1,5 +1,5 @@
 import { styles } from "@/scripts/styles";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Dimensions, Modal, Pressable, Text, Vibration, View, Switch, TouchableOpacity, SectionList, ScrollView, LogBox, Linking, Alert, ToastAndroid, Button, FlatList } from "react-native";
 import { themes } from "./themes";
 import { subThemes } from "./subThemes";
@@ -9,8 +9,20 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { AppState, AppStateStatus } from "react-native";
 import { showAppOpenAd, loadAppOpenAd } from "./AppOpenAd";
 
+import {
+  AdEventType,
+  RewardedAdEventType,
+  RewardedInterstitialAd,
+  TestIds,
+} from 'react-native-google-mobile-ads';
+
+const adUnitId = 'ca-app-pub-1726341387159051/2076290611';
+
+
 export default function Index() {
 
+const[rewardedInterstitial, setRewardedInterstitial] = useState(RewardedInterstitialAd.createForAdRequest(adUnitId));    
+rewardedInterstitial.load();
 
 const [dt, setDt] = useState(new Date().toLocaleString());
 const [yr, setYr] = useState(new Date().getFullYear().toLocaleString());
@@ -30,6 +42,7 @@ const [needFontsReload, setNeedFontsReload] = useState(true);
 const [toasterShown, setToasterShown] = useState(false);
 
 const [currentUserConfig, setCurrentUserConfig] = useState<any>(null);
+const currConfRef = useRef(currentUserConfig);
 
 
 const [isSecondsVisible, setIsSecondsVisible] = useState<any>(null);
@@ -129,7 +142,60 @@ if(needFontsReload){
     };
     })
 }
-      
+   
+const [loaded, setLoaded] = useState(false);
+const [redeemableTheme, setRedeemableTheme] = useState<any>(null);
+const redeemableThemeRef = useRef(redeemableTheme);
+
+  useEffect(() => {
+    redeemableThemeRef.current = redeemableTheme;
+    currConfRef.current = currentUserConfig;
+
+    const unsubscribe = () => {
+      rewardedInterstitial.addAdEventListener(RewardedAdEventType.LOADED, ()=> {  
+        setLoaded(true);  
+        console.log('Rewarded Institial Ad Loaded'); 
+      });
+      rewardedInterstitial.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward)=> {  
+        if(reward.type == 'Unlocked'){
+          let curr = redeemableThemeRef.current;
+          let conf = currConfRef.current;
+          setTimerObj(curr);
+          setModalThemeVisible(!modalThemeVisible); 
+          let newCurrentUserConfig = ({name: curr.name, font: curr.font, color: curr.color, sizePerc: curr.sizePerc, locked: curr.locked, isSecondsVisible: conf.isSecondsVisible, is24hrFormat: conf.is24hrFormat, isAwake: conf.isAwake});
+          setCurrentUserConfig(newCurrentUserConfig);
+          modifyData("UserConfig", newCurrentUserConfig); 
+        }
+        console.log('User earned reward:', reward) 
+      });
+      rewardedInterstitial.addAdEventListener(AdEventType.CLOSED, ()=> { 
+        rewardedInterstitial.load();
+        console.log('Rewarded Institial Ad Closed');
+      });
+      rewardedInterstitial.addAdEventListener(AdEventType.ERROR, (err)=> { 
+        console.log(err); 
+      });
+      rewardedInterstitial.addAdEventListener(AdEventType.OPENED, (err)=> { 
+        console.log('Rewarded Institial Ad Opened');  
+    });
+  }
+    
+    // Load the ad for the first time
+    rewardedInterstitial.load();      
+
+    return unsubscribe();
+  }, [redeemableTheme]);
+
+  const showRewinstAd = () => {
+    if (loaded) {
+      setLoaded(false);
+      rewardedInterstitial.show();
+    } else {
+      console.log('Ad not loaded yet.'); 
+      return null;
+    }
+  };
+
 useEffect(() => {
     let secTimer = setInterval( () => {
       var dateTime = new Date();
@@ -337,24 +403,6 @@ return (
 
                   {getSubThemes(timerObj.name, false)}
 
-                  {/* <FlatList
-                      inverted
-                      style={styles.subThemesList}
-                      horizontal
-                      data={subThemes}
-                      renderItem={(subItem) => (
-                        <TouchableOpacity style={{display: (subItem.item.name == timerObj.name) ? 'flex':'none', flexDirection:'column'}} 
-                        onPress={()=>{
-                          let newCurrentUserConfig = ({name: currentUserConfig.name, font: currentUserConfig.font, color: subItem.item.color, sizePerc: currentUserConfig.sizePerc, locked: currentUserConfig.locked, isSecondsVisible: currentUserConfig.isSecondsVisible, is24hrFormat: currentUserConfig.is24hrFormat, isAwake: currentUserConfig.isAwake});
-                          setCurrentUserConfig(newCurrentUserConfig);
-                          modifyData("UserConfig", newCurrentUserConfig);
-                          setTimerObj(newCurrentUserConfig);
-                        }}>
-                            <Text style={[styles.subTheme,{backgroundColor:subItem.item.color, borderColor: timerObj.color}]} >     </Text>
-                        </TouchableOpacity>
-                      )}
-                      keyExtractor={item => item.id}
-                    /> */}
                   </View>
                 </View>
               </TouchableOpacity>
@@ -399,7 +447,7 @@ return (
               keyExtractor={(item, index) => item.name + index}
               renderItem={({item}) => (
                 
-                <TouchableOpacity onPress={()=> {               
+                <TouchableOpacity onPress={ ()=> {               
                   if(!item.locked){
                     setTimerObj(item);
                     setModalThemeVisible(!modalThemeVisible);
@@ -409,12 +457,15 @@ return (
                   }
                   else
                   {
-                    Linking.openURL("market://details?id=com.phantomHookLabs.nocturnalClockPro");
+                    setRedeemableTheme(item);
+                    showRewinstAd(); 
+                    
+                    //Linking.openURL("market://details?id=com.phantomHookLabs.nocturnalClockPro");
                   }
                   }}>
                 <View style={[styles.item, {width: fixedWidth * 0.5, borderWidth: (timerObj.font==item.font) ? 2 : 0, borderColor: timerObj.color, backgroundColor: item.locked? '#171717' : 'black'}]}>
-                <Text style={[styles.Pro, {display: item.locked ? 'flex' : 'none'}]} >Pro Version 👑</Text>
-                <Text style={[styles.Pro, {display: !item.locked ? 'flex' : 'none'}]} >Free</Text>
+                <Text style={[styles.Pro, {display: item.locked ? 'flex' : 'none'}]} >Watch Ad ▶</Text>
+                <Text style={[styles.Pro, {display: !item.locked ? 'flex' : 'none'}]} > </Text>
                 <Text style={[styles.themeTime, {fontFamily: item.font, color: item.color, fontSize: fixedHeight * item.sizePerc}]} >{hr} : {min}</Text>
                   
                 <View style={{flexDirection: 'row'}}>
@@ -422,16 +473,6 @@ return (
                   <Text style={styles.themeName} >{item.name}</Text>
                   {getSubThemes(item.name, true)}
 
-                  {/* <FlatList
-                      inverted
-                      style={styles.subThemesList}
-                      horizontal
-                      data={subThemes}
-                      renderItem={(subItem) => (                
-                            <Text style={[styles.subTheme,{display: (subItem.item.name == item.name) ? 'flex':'none',backgroundColor:subItem.item.color, borderColor: timerObj.color}]} >     </Text>
-                      )}
-                      keyExtractor={item => item.id}
-                    /> */}
                 </View>
 
                 </View>
